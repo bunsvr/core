@@ -1,0 +1,11 @@
+# Git
+.gitignore
+
+# Packages
+node_modules
+bun.lockb
+
+# Development
+src
+assets
+tsconfig.json
