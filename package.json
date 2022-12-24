@@ -1,10 +1,10 @@
 {
   "name": "@bunsvr/core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Core server of bunsvr",
   "types": "types/index.d.ts",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --format=esm --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
+    "build": "esbuild src/index.ts --bundle --format=esm --minify --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
   },
   "devDependencies": {
     "bun-types": "^0.4.0",
