@@ -1,4 +1,8 @@
-import { RequestBody, RequestURL } from "./types";
+import { RequestBody, RequestQuery, RequestURL } from "./types";
+
+function* iter(searchParams: URLSearchParams) {
+    yield* searchParams.entries();
+}
 
 export function parseURL(url: string): RequestURL {
     const parsed = new URL(url);
@@ -10,7 +14,11 @@ export function parseURL(url: string): RequestURL {
         path: parsed.pathname,
         fragment: parsed.hash,
         port: Number(parsed.port),
-        query: parsed.searchParams.entries(),
+        query: new Proxy(iter(parsed.searchParams) as RequestQuery, {
+            get(_, p) {
+                return parsed.searchParams.get(p as string);
+            }
+        }),
     }
 };
 

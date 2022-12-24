@@ -18,16 +18,48 @@ export interface AppResponse extends ResponseInit {
 }
 
 /**
+ * Request query type
+ */
+export type RequestQuery = Record<string, string> & IterableIterator<[string, string]>;
+
+/**
  * A parsed request URL
  */
 export interface RequestURL {
+    /**
+     * Full URL
+     */
     readonly href: string;
+
+    /**
+     * Protocol
+     */
     readonly protocol: string;
+
+    /**
+     * Full domain
+     */
     readonly domain: string;
+
+    /**
+     * URL path without query
+     */
     readonly path: string;
+
+    /**
+     * URL hash or fragment
+     */
     readonly fragment: string;
+
+    /**
+     * URL port
+     */
     readonly port: number;
-    readonly query: IterableIterator<[string, string]>;
+
+    /**
+     * URL parsed query
+     */
+    readonly query: RequestQuery;
 }
 
 /**
