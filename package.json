@@ -1,19 +1,19 @@
 {
   "name": "@bunsvr/core",
   "version": "0.0.3",
-  "description": "Core server of bunsvr",
-  "types": "types/index.d.ts",
-  "scripts": {
-    "build": "esbuild src/index.ts --bundle --format=esm --minify --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
+  "repository": {
+    "url": "https://github.com/bunsvr/core"
   },
+  "main": "index.js",
   "devDependencies": {
     "bun-types": "^0.4.0",
     "esbuild": "^0.16.10",
     "typescript": "^4.9.4"
   },
+  "description": "Core server of bunsvr",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --format=esm --minify --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
+  },
   "type": "module",
-  "main": "index.js",
-  "repository": {
-    "url": "https://github.com/bunsvr/core"
-  }
+  "types": "types/index.d.ts"
 }
