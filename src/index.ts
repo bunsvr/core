@@ -101,3 +101,4 @@ class App {
 }
 
 export default App;
+export * from "./types";
