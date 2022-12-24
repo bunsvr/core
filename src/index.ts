@@ -1,13 +1,17 @@
-import { file, Server } from "bun";
+import { 
+    file,
+    Server, 
+    TLSOptions, 
+    ServerWebSocket, 
+    WebSocketServeOptions, 
+    ServeOptions 
+} from "bun";
 import { Middleware, Context } from "./types";
 import createCtx from "./createCtx";
 import { formatBody } from "./parsers";
 
-interface App extends Omit<Server, "fetch"> {
-    /**
-     * Fetch handler
-     */
-    fetch(request: Request, server: Server): Promise<Response>;
+interface App extends TLSOptions, Partial<ServerWebSocket>, Partial<WebSocketServeOptions>, Partial<ServeOptions> {
+    serverNames: Record<string, TLSOptions>;
 };
 
 class App {
@@ -71,7 +75,7 @@ class App {
         try {
             await this.runMiddleware(0, ctx);
         } catch (e) {
-            await this.error(e, ctx);
+            await this.catch(e, ctx);
         }
 
         return this.response(ctx);
@@ -91,7 +95,7 @@ class App {
      * @param err 
      * @param ctx 
      */
-    async error(err: any, ctx: Context) {
+    async catch(err: any, ctx: Context) {
         ctx.response.body = err;
     }
 }
