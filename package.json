@@ -11,5 +11,9 @@
     "esbuild": "^0.16.10",
     "typescript": "^4.9.4"
   },
-  "type": "module"
+  "type": "module",
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/bunsvr/core"
+  }
 }
