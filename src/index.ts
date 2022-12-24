@@ -6,7 +6,7 @@ import {
     WebSocketServeOptions, 
     ServeOptions 
 } from "bun";
-import { Middleware, Context } from "./types";
+import { Middleware, AppContext } from "./types";
 import createCtx from "./createCtx";
 import { formatBody } from "./parsers";
 
@@ -51,7 +51,7 @@ class App {
      * @param index 
      * @param ctx 
      */
-    private async runMiddleware(index: number, ctx: Context) {
+    private async runMiddleware(index: number, ctx: AppContext) {
         if (index >= this.mds.length || index < 0)
             return;
 
@@ -85,7 +85,7 @@ class App {
      * Response after running middlewares. Change this to change the response returned
      * @param ctx
      */
-    async response(ctx: Context) {
+    async response(ctx: AppContext) {
         return new Response(formatBody(ctx.response.body), ctx.response);
     }
 
@@ -95,7 +95,7 @@ class App {
      * @param err 
      * @param ctx 
      */
-    async catch(err: any, ctx: Context) {
+    async catch(err: any, ctx: AppContext) {
         ctx.response.body = err;
     }
 }

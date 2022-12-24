@@ -1,11 +1,12 @@
 import { RequestBody, RequestQuery, RequestURL } from "./types";
 
-function* iter(searchParams: URLSearchParams) {
-    yield* searchParams.entries();
-}
-
 export function parseURL(url: string): RequestURL {
     const parsed = new URL(url);
+    const entries = parsed.searchParams.entries();
+
+    function* iter() {
+        yield* entries;
+    }
 
     return {
         href: parsed.href,
@@ -14,8 +15,14 @@ export function parseURL(url: string): RequestURL {
         path: parsed.pathname,
         fragment: parsed.hash,
         port: Number(parsed.port),
-        query: new Proxy(iter(parsed.searchParams) as RequestQuery, {
+        query: new Proxy({} as RequestQuery, {
             get(_, p) {
+                if (p === Symbol.iterator)
+                    return iter;
+
+                if (typeof p !== "string")
+                    return;
+
                 return parsed.searchParams.get(p as string);
             }
         }),

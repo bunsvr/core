@@ -186,7 +186,7 @@ export interface AppRequest {
 /**
  * Request context
  */
-export interface Context {
+export interface AppContext {
     readonly request: AppRequest;
     readonly response: AppResponse;
     readonly server: Server;
@@ -196,5 +196,5 @@ export interface Context {
  * Middleware function
  */
 export interface Middleware {
-    (ctx: Context, next: NextFunction): any;
+    (ctx: AppContext, next: NextFunction): any;
 }

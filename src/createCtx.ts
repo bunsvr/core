@@ -1,9 +1,9 @@
 import { Server } from "bun";
-import { Context } from "./types";
+import { AppContext } from "./types";
 import { parseBody, parseURL } from "./parsers";
 
 export default function createCtx(req: Request, server: Server) {
-    const ctx: Context = { 
+    const ctx: AppContext = { 
         request: {
             url: parseURL(req.url),
             body: parseBody(req),
