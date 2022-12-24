@@ -9,7 +9,7 @@ app.use(async (ctx, next) => {
     const url = ctx.request.url;
 
     // Set response to parsed url parts
-    ctx.response.body += "Protocol: " + url.protocol + "\n";
+    ctx.response.body = "Protocol: " + url.protocol + "\n";
     ctx.response.body += "Domain: " + url.domain + "\n";
     ctx.response.body += "Port: " + url.port + "\n";
     ctx.response.body += "Path: " + url.path + "\n";
