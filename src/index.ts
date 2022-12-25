@@ -16,7 +16,7 @@ interface App extends TLSOptions, Partial<ServerWebSocket>, Partial<WebSocketSer
 
 class App {
     private mds: Middleware[];
-    private iconData: ReadableStream | string;
+    ico: Response;
 
     /**
      * Create an app that can be served using Bun
@@ -25,7 +25,7 @@ class App {
         this.mds = [];
         // @ts-ignore
         this.port = process.env.PORT || 8080;
-        this.iconData = "";
+        this.ico = new Response();
     }
 
     /**
@@ -42,8 +42,8 @@ class App {
      * every favicon request.
      * @param path 
      */
-    async icon(path: string) {
-        this.iconData = file(path).readable;
+    async icon(path?: string) {
+        this.ico = new Response(file(path).readable);
     }
 
     /**
@@ -68,16 +68,23 @@ class App {
      */
     fetch = async (request: Request, server: Server) => {
         if (request.url.endsWith("favicon.ico"))
-            return new Response(this.iconData);
+            return this.ico;
+
+        // Custom validate
+        const response = await this.validate(request, server);
+        if (response !== true)
+            return response as unknown as Response;
 
         const ctx = createCtx(request, server);
 
+        // Run middleware and catch errors
         try {
             await this.runMiddleware(0, ctx);
         } catch (e) {
             await this.catch(e, ctx);
         }
 
+        // Custom response
         return this.response(ctx);
     }
 
@@ -96,7 +103,21 @@ class App {
      * @param ctx 
      */
     async catch(err: any, ctx: AppContext) {
-        ctx.response.body = err;
+        console.error(err);
+        ctx.response.status = 500;
+    }
+
+    /**
+     * Validate the request before creating request context
+     * If validate returns a Response object then it is used to response
+     * If validate returns true then start other steps
+     * @param request 
+     */
+    validate(request: Request, server: Server): Promise<boolean | void | null | undefined | Response>;
+
+    // Default implementation returns true
+    async validate() {
+        return true;
     }
 }
 
