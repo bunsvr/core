@@ -70,12 +70,12 @@ class App {
         if (request.url.endsWith("favicon.ico"))
             return this.ico;
 
-        const ctx = createCtx(request, server);
-        
         // Custom validate
-        const response = await this.validate(ctx);
+        const response = await this.validate(request, server);
         if (response !== true)
             return response as unknown as Response;
+
+        const ctx = createCtx(request, server);
 
         // Run middleware and catch errors
         try {
@@ -111,9 +111,10 @@ class App {
      * Validate the request before creating request context
      * If validate returns a Response object then it is used to response
      * If validate returns true then start other steps
+     * The validator is run before context creation for better performance when using WebSocket cuz in WebSocket you don't need an AppContext
      * @param request 
      */
-    validate(ctx: AppContext): Promise<boolean | void | null | undefined | Response>;
+    validate(request: Request, server: Server): Promise<boolean | void | null | undefined | Response>;
 
     // Default implementation returns true
     async validate() {

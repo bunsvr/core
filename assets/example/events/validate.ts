@@ -1,5 +1,5 @@
-import App, { AppContext } from "../../..";
-import { serve } from "bun";
+import App from "../../..";
+import { Server, serve } from "bun";
 
 // Create a new app
 const app = new App();
@@ -26,15 +26,15 @@ const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 const methodNotAllowed = new Response("Method not allowed", { status: 405 });
 
 // Use a validator
-app.validate = async (ctx: AppContext) => {
-    const { method, url, value } = ctx.request;
+app.validate = async (req: Request, server: Server) => {
+    const path = new URL(req.url).pathname;
 
     // Upgrade to WebSocket when pathname starts with "/ws"
-    if (url.path.startsWith("/ws"))
-        return ctx.server.upgrade(value) ? null : upgradeFailed;
+    if (path.startsWith("/ws"))
+        return server.upgrade(req) ? null : upgradeFailed;
 
     // Only allow request method "GET"
-    return method === "GET" || methodNotAllowed;
+    return req.method === "GET" || methodNotAllowed;
 };
 
 // Serve using bun
