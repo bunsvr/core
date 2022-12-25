@@ -1,4 +1,4 @@
-import App, { AppContext, response } from "../../..";
+import { AppContext, response, App } from "../../..";
 import { serve } from "bun";
 
 // Create a new app

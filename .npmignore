@@ -9,3 +9,4 @@ bun.lockb
 src
 assets
 tsconfig.json
+typedoc.json

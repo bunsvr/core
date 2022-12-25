@@ -1,4 +1,4 @@
-import App from "../../..";
+import { App } from "../../..";
 import { serve } from "bun";
 
 // Create a new app

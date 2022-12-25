@@ -21,8 +21,19 @@ export interface AppResponse extends ResponseInit {
  * Request context
  */
 export interface AppContext {
+    /**
+     * Incoming request
+     */
     readonly request: Request;
+
+    /**
+     * Response details
+     */
     readonly response: AppResponse;
+
+    /**
+     * Current Bun.js server
+     */
     readonly server: Server;
 }
 
