@@ -1,4 +1,4 @@
-import App, { AppContext } from "../../..";
+import App, { AppContext, response } from "../../..";
 import { serve } from "bun";
 
 // Create a new app
@@ -21,11 +21,15 @@ app.use(async (ctx, next) => {
 
 // Custom response
 app.response = async (ctx: AppContext) => {
-    // Set status code to the value of code property in the response body
-    ctx.response.status = ctx.response.body.code;
+    const res = ctx.response;
 
+    // Set status code to the value of code property in the response body
     // Return the data property in the response body only
-    return new Response(JSON.stringify(ctx.response.body.data), ctx.response);
+    res.status = res.body.code;
+    res.body = res.body.data;
+
+    // Default response
+    return response(ctx);
 }
 
 // Serve using bun

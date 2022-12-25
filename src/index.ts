@@ -4,11 +4,20 @@ import {
     TLSOptions, 
     ServerWebSocket, 
     WebSocketServeOptions, 
-    ServeOptions 
+    ServeOptions,
+    env
 } from "bun";
 import { Middleware, AppContext } from "./types";
-import createCtx from "./createCtx";
 import { formatBody } from "./parsers";
+
+/**
+ * Default response
+ * @param ctx 
+ * @returns 
+ */
+export function response(ctx: AppContext) {
+    return new Response(formatBody(ctx.response.body), ctx.response);
+};
 
 interface App extends TLSOptions, Partial<ServerWebSocket>, Partial<WebSocketServeOptions>, Partial<ServeOptions> {
     serverNames: Record<string, TLSOptions>;
@@ -24,7 +33,7 @@ class App {
     constructor() {
         this.mds = [];
         // @ts-ignore
-        this.port = process.env.PORT || 8080;
+        this.port = env.PORT || 8080;
         this.ico = new Response();
     }
 
@@ -43,7 +52,7 @@ class App {
      * every favicon request.
      * @param path 
      */
-    async icon(path?: string) {
+    async icon(path: string) {
         this.ico = new Response(file(path).readable);
     }
 
@@ -71,12 +80,16 @@ class App {
         if (request.url.endsWith("favicon.ico"))
             return this.ico;
 
-        // Custom validate
-        const response = await this.validate(request, server);
-        if (response !== true)
-            return response as unknown as Response;
+        const ctx = { 
+            request, 
+            response: {}, 
+            server
+        };
 
-        const ctx = createCtx(request, server);
+        // Custom validate
+        const response = await this.validate(ctx);
+        if (response)
+            return response as unknown as Response;
 
         // Run middleware and catch errors
         try {
@@ -94,7 +107,7 @@ class App {
      * @param ctx
      */
     async response(ctx: AppContext) {
-        return new Response(formatBody(ctx.response.body), ctx.response);
+        return response(ctx);
     }
 
     /**
@@ -104,27 +117,23 @@ class App {
      * @param err 
      * @param ctx 
      */
-    async catch(err: any, ctx: AppContext) {
-        console.error(err);
-        ctx.response.status = 500;
+    catch(err: any, ctx: AppContext): Promise<void>;
+    async catch(err: any) {  
+        throw err;
     }
 
     /**
-     * Validate the request before creating request context
+     * Validate the request before running middlewares
      * 
-     * If validate returns a Response object then it is used to response
+     * If validate returns a Response object or a "truthy" object then it is used to response
      * 
-     * If validate returns true then start other steps
+     * If validate returns a "falsy" object then start other steps
      * 
      * The validator is run before context creation for better performance when using WebSocket cuz in WebSocket you don't need an AppContext
      * @param request 
      */
-    validate(request: Request, server: Server): Promise<boolean | void | null | undefined | Response>;
-
-    // Default implementation returns true
-    async validate() {
-        return true;
-    }
+    validate(ctx: AppContext): Promise<boolean | void | null | undefined | Response>;
+    async validate() {}
 }
 
 export default App;

@@ -18,36 +18,6 @@ export interface AppResponse extends ResponseInit {
 }
 
 /**
- * A request body
- */
-export interface RequestBody {
-    /**
-     * Body in text
-     */
-    readonly text: Promise<string>;
-
-    /**
-     * Body in readable stream
-     */
-    readonly stream?: ReadableStream;
-
-    /**
-     * Body in buffer array
-     */
-    readonly buffers: Promise<ArrayBuffer>;
-
-    /**
-     * Body in json
-     */
-    readonly json: Promise<any>;
-
-    /**
-     * Body in blob
-     */
-    readonly blob: Promise<Blob>;
-}
-
-/**
  * Request context
  */
 export interface AppContext {
@@ -60,5 +30,5 @@ export interface AppContext {
  * Middleware function
  */
 export interface Middleware {
-    (ctx: AppContext, next: NextFunction): any;
+    (ctx: AppContext, next: NextFunction): Promise<void>;
 }
