@@ -63,14 +63,13 @@ class App {
 
     /**
      * Run a middleware.
-     * @param index 
-     * @param ctx 
+     * @param index Middleware index in middleware array
+     * @param ctx The current context
      */
     private async runMiddleware(index: number, ctx: AppContext) {
-        if (index >= this.mds.length || index < 0)
-            return;
+        const fn = this.mds[index];
 
-        return this.mds[index](
+        return fn && fn(
             ctx,
             async () => this.runMiddleware(index + 1, ctx)
         );
