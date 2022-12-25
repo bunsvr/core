@@ -5,6 +5,7 @@ import { parseBody, parseURL } from "./parsers";
 export default function createCtx(req: Request, server: Server) {
     const ctx: AppContext = { 
         request: {
+            value: req,
             url: parseURL(req.url),
             body: parseBody(req),
             headers: req.headers,

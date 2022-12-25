@@ -70,12 +70,12 @@ class App {
         if (request.url.endsWith("favicon.ico"))
             return this.ico;
 
+        const ctx = createCtx(request, server);
+        
         // Custom validate
-        const response = await this.validate(request, server);
+        const response = await this.validate(ctx);
         if (response !== true)
             return response as unknown as Response;
-
-        const ctx = createCtx(request, server);
 
         // Run middleware and catch errors
         try {
@@ -113,7 +113,7 @@ class App {
      * If validate returns true then start other steps
      * @param request 
      */
-    validate(request: Request, server: Server): Promise<boolean | void | null | undefined | Response>;
+    validate(ctx: AppContext): Promise<boolean | void | null | undefined | Response>;
 
     // Default implementation returns true
     async validate() {

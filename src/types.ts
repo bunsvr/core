@@ -116,6 +116,11 @@ export interface RequestBody {
  */
 export interface AppRequest {
     /**
+     * Request object
+     */
+    readonly value: Request;
+
+    /**
      * URL parts
      */
     readonly url: RequestURL;
