@@ -6,18 +6,18 @@ const app = new App();
 
 // Use a middleware
 app.use(async (ctx, next) => {
-    const url = ctx.request.url;
+    const url = new URL(ctx.request.url);
 
     // Set response to parsed url parts
     ctx.response.body = "Protocol: " + url.protocol + "\n";
-    ctx.response.body += "Domain: " + url.domain + "\n";
+    ctx.response.body += "Domain: " + url.hostname + "\n";
     ctx.response.body += "Port: " + url.port + "\n";
-    ctx.response.body += "Path: " + url.path + "\n";
-    ctx.response.body += "Hash: " + url.fragment + "\n";
+    ctx.response.body += "Path: " + url.pathname + "\n";
+    ctx.response.body += "Hash: " + url.hash + "\n";
 
     // Loop through URL query
     ctx.response.body += "Query:\n";
-    for (const [key, val] of url.query) 
+    for (const [key, val] of url.searchParams.entries()) 
         ctx.response.body += "\t" + key + ": " + val + "\n";
     
     // Call next middleware
