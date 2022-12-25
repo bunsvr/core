@@ -17,5 +17,9 @@
     "docs": "typedoc"
   },
   "type": "module",
-  "types": "types/index.d.ts"
+  "types": "types/index.d.ts",
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "displayName": "@bunsvr/core"
+  }
 }
