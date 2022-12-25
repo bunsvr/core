@@ -38,7 +38,8 @@ class App {
 
     /**
      * Set an icon. 
-     * By default an empty string is returned for 
+     * 
+     * By default an empty Response is returned for 
      * every favicon request.
      * @param path 
      */
@@ -98,6 +99,7 @@ class App {
 
     /**
      * Error handler. Change this to change how server handles error
+     * 
      * Handles errors in middlewares
      * @param err 
      * @param ctx 
@@ -109,8 +111,11 @@ class App {
 
     /**
      * Validate the request before creating request context
+     * 
      * If validate returns a Response object then it is used to response
+     * 
      * If validate returns true then start other steps
+     * 
      * The validator is run before context creation for better performance when using WebSocket cuz in WebSocket you don't need an AppContext
      * @param request 
      */
