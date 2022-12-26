@@ -1,4 +1,4 @@
-import { App, AppContext } from "../../..";
+import { App } from "../../..";
 import { serve } from "bun";
 
 // Create a new app
@@ -11,7 +11,7 @@ app.use(async () => {
 });
 
 // Register an error handler
-app.catch = async (err: Error, ctx: AppContext) => {
+app.catch = async (err, ctx) => {
     ctx.response.body = err.message;
     ctx.response.status = 500;
 }

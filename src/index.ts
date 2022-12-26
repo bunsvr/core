@@ -31,7 +31,7 @@ interface App extends Options {
      * @param err An error occured
      * @param ctx The current context
      */
-    catch(err: any, ctx: AppContext, app: App): Promise<void>;
+    catch(err: any, ctx: AppContext<App>): Promise<void>;
 
     /**
      * Validate the request before running middlewares.
@@ -41,20 +41,20 @@ interface App extends Options {
      * If validate returns a "falsy" object then start other steps.
      * @param ctx The current context
      */
-    validate(ctx: AppContext, app: App): Promise<ValidateResult>;
+    validate(ctx: AppContext<App>): Promise<ValidateResult>;
 
     /**
      * Response after running middlewares. Change this to change the response returned.
      * @param ctx The current context
      */
-    response(ctx: AppContext, app: App): Promise<Response>;
+    response(ctx: AppContext<App>): Promise<Response>;
 };
 
 /**
  * A Bunsvr app
  */
 class App {
-    private mds: Middleware[];
+    private mds: Middleware<App>[];
     private ico?: ArrayBuffer;
 
     /**
@@ -70,7 +70,7 @@ class App {
      * Register a middleware
      * @param m The middleware to add
      */
-    use(m: Middleware) {
+    use(m: Middleware<App>) {
         this.mds.push(m);
     }
 
@@ -85,7 +85,7 @@ class App {
         this.ico = await file(path).arrayBuffer();
     }
 
-    private async runMiddleware(index: number, ctx: AppContext) {
+    private async runMiddleware(index: number, ctx: AppContext<App>) {
         const fn = this.mds[index];
 
         return fn && fn(
@@ -98,11 +98,12 @@ class App {
         const ctx = { 
             request, 
             response: {}, 
-            server
+            server,
+            app: this,
         };
 
         // Custom validate
-        const response = await this.validate(ctx, this);
+        const response = await this.validate(ctx);
         if (response)
             return response as unknown as Response;
 
@@ -110,22 +111,22 @@ class App {
         try {
             await this.runMiddleware(0, ctx);
         } catch (e) {
-            await this.catch(e, ctx, this);
+            await this.catch(e, ctx);
         }
 
         // Custom response
-        return this.response(ctx, this);
+        return this.response(ctx);
     }
 
     // Default handlers
-    async response(ctx: AppContext) {
+    async response(ctx: AppContext<App>) {
         return App.response(ctx);
     }
-    async catch(err: any) {  
-        throw err;
+    async catch(err: any, ctx: AppContext<App>) {  
+        return App.catch(err, ctx);
     }
-    async validate(ctx: AppContext) {
-        return App.validate(ctx, this);
+    async validate(ctx: AppContext<App>) {
+        return App.validate(ctx);
     }
 
     /**
@@ -133,20 +134,29 @@ class App {
      * @param ctx The current context
      * @returns A response
      */
-    static response(ctx: AppContext) {
+    static response(ctx: AppContext<App>) {
         return new Response(formatBody(ctx.response.body), ctx.response);
     };
 
     /**
      * The default validate handler
      * @param ctx The current context
-     * @param app The app
-     * @returns 
      */
-    static validate(ctx: AppContext, app: App): ValidateResult {
+    static validate(ctx: AppContext<App>): ValidateResult {
         const path = ctx.request.url.match(urlRegex);
-        if (app.ico && path[2] === "/favicon.ico")
-            return new Response(app.ico);
+        const ico = ctx.app.ico;
+
+        if (ico && path[2] === "/favicon.ico")
+            return new Response(ico);
+    }
+    
+    /**
+     * The default error handler
+     * @param ctx The current context
+     */
+    static catch(err: any, ctx: AppContext<App>) {
+        console.error(err);
+        ctx.response.status = 500;
     }
 }
 

@@ -1,4 +1,4 @@
-import { App, AppContext } from "../../../types";
+import { App } from "../../../types";
 import { serve } from "bun";
 
 // Create a new app
@@ -18,7 +18,7 @@ const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 // Use a validator
 // If upgrade success returns nothing
 // If not return upgrade failed response
-app.validate = async (ctx: AppContext) => 
+app.validate = async ctx => 
     // Upgrade to WebSocket
     ctx.server.upgrade(ctx.request) || upgradeFailed;
 

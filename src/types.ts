@@ -20,7 +20,7 @@ export interface AppResponse extends ResponseInit {
 /**
  * Request context
  */
-export interface AppContext {
+export interface AppContext<App> {
     /**
      * Incoming request
      */
@@ -35,13 +35,18 @@ export interface AppContext {
      * Current Bun.js server
      */
     readonly server: Server;
+
+    /**
+     * Current app
+     */
+    readonly app: App;
 }
 
 /**
  * Middleware function
  */
-export interface Middleware {
-    (ctx: AppContext, next: NextFunction): Promise<void>;
+export interface Middleware<App> {
+    (ctx: AppContext<App>, next: NextFunction): Promise<void>;
 }
 
 /**
