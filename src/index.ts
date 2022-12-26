@@ -4,8 +4,7 @@ import {
     TLSOptions, 
     ServerWebSocket, 
     WebSocketServeOptions, 
-    ServeOptions,
-    env
+    ServeOptions
 } from "bun";
 import { Middleware, AppContext, ValidateResult } from "./types";
 import { formatBody } from "./parsers";
@@ -55,15 +54,17 @@ interface App extends Options {
  */
 class App {
     private mds: Middleware<App>[];
-    private ico?: ArrayBuffer;
+
+    /**
+     * App icon loaded in ArrayBuffer
+     */
+    ico?: ArrayBuffer;
 
     /**
      * Create an app that can be served using Bun.
      */
     constructor() {
         this.mds = [];
-        // @ts-ignore
-        this.port = env.PORT || 8080;
     }
 
     /**
