@@ -16,6 +16,8 @@ app.websocket = {
 const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 
 // Use a validator
+// If upgrade success returns nothing
+// If not return upgrade failed response
 app.validate = async (ctx: AppContext) => 
     // Upgrade to WebSocket
     ctx.server.upgrade(ctx.request) || upgradeFailed;

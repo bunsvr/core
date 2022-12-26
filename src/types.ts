@@ -43,3 +43,8 @@ export interface AppContext {
 export interface Middleware {
     (ctx: AppContext, next: NextFunction): Promise<void>;
 }
+
+/**
+ * App.validate result.
+ */
+export type ValidateResult = boolean | void | null | undefined | Response;

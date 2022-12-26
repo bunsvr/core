@@ -7,30 +7,55 @@ import {
     ServeOptions,
     env
 } from "bun";
-import { Middleware, AppContext } from "./types";
+import { Middleware, AppContext, ValidateResult } from "./types";
 import { formatBody } from "./parsers";
 
-/**
- * Default response
- * @param ctx 
- * @returns 
- */
-export function response(ctx: AppContext) {
-    return new Response(formatBody(ctx.response.body), ctx.response);
-};
+const urlRegex = /^(.*):\/\/[A-Za-z0-9:.]*([\/]{1}.*\/?)$/;
 
 interface Options extends TLSOptions, Partial<ServerWebSocket>, Partial<WebSocketServeOptions>, Partial<ServeOptions> {
     serverNames: Record<string, TLSOptions>;
 }
 
-interface App extends Options {};
+interface App extends Options {
+    /**
+     * Fetch handler.
+     * @param request Incoming request
+     * @param server Current Bun.js server
+     */
+    fetch(request: Request, server: Server): Promise<Response>;
+
+    /**
+     * Error handler. Change this to change how server handles error.
+     * 
+     * Handles errors in middlewares.
+     * @param err An error occured
+     * @param ctx The current context
+     */
+    catch(err: any, ctx: AppContext, app: App): Promise<void>;
+
+    /**
+     * Validate the request before running middlewares.
+     * 
+     * If validate returns a Response object or a "truthy" object then it is used to response.
+     * 
+     * If validate returns a "falsy" object then start other steps.
+     * @param ctx The current context
+     */
+    validate(ctx: AppContext, app: App): Promise<ValidateResult>;
+
+    /**
+     * Response after running middlewares. Change this to change the response returned.
+     * @param ctx The current context
+     */
+    response(ctx: AppContext, app: App): Promise<Response>;
+};
 
 /**
  * A Bunsvr app
  */
 class App {
     private mds: Middleware[];
-    private ico: Response;
+    private ico?: ArrayBuffer;
 
     /**
      * Create an app that can be served using Bun.
@@ -39,7 +64,6 @@ class App {
         this.mds = [];
         // @ts-ignore
         this.port = env.PORT || 8080;
-        this.ico = new Response();
     }
 
     /**
@@ -58,14 +82,9 @@ class App {
      * @param path The icon path
      */
     async icon(path: string) {
-        this.ico = new Response(file(path).readable);
+        this.ico = await file(path).arrayBuffer();
     }
 
-    /**
-     * Run a middleware.
-     * @param index Middleware index in middleware array
-     * @param ctx The current context
-     */
     private async runMiddleware(index: number, ctx: AppContext) {
         const fn = this.mds[index];
 
@@ -75,15 +94,7 @@ class App {
         );
     }
 
-    /**
-     * Fetch handler.
-     * @param request Incoming request
-     * @param server Current Bun.js server
-     */
     fetch = async (request: Request, server: Server) => {
-        if (request.url.endsWith("favicon.ico"))
-            return this.ico;
-
         const ctx = { 
             request, 
             response: {}, 
@@ -91,7 +102,7 @@ class App {
         };
 
         // Custom validate
-        const response = await this.validate(ctx);
+        const response = await this.validate(ctx, this);
         if (response)
             return response as unknown as Response;
 
@@ -99,43 +110,44 @@ class App {
         try {
             await this.runMiddleware(0, ctx);
         } catch (e) {
-            await this.catch(e, ctx);
+            await this.catch(e, ctx, this);
         }
 
         // Custom response
-        return this.response(ctx);
+        return this.response(ctx, this);
     }
 
-    /**
-     * Response after running middlewares. Change this to change the response returned.
-     * @param ctx The current context
-     */
+    // Default handlers
     async response(ctx: AppContext) {
-        return response(ctx);
+        return App.response(ctx);
     }
-
-    /**
-     * Error handler. Change this to change how server handles error.
-     * 
-     * Handles errors in middlewares.
-     * @param err An error occured
-     * @param ctx The current context
-     */
-    catch(err: any, ctx: AppContext): Promise<void>;
     async catch(err: any) {  
         throw err;
     }
+    async validate(ctx: AppContext) {
+        return App.validate(ctx, this);
+    }
 
     /**
-     * Validate the request before running middlewares.
-     * 
-     * If validate returns a Response object or a "truthy" object then it is used to response.
-     * 
-     * If validate returns a "falsy" object then start other steps.
+     * The default response handler
      * @param ctx The current context
+     * @returns A response
      */
-    validate(ctx: AppContext): Promise<boolean | void | null | undefined | Response>;
-    async validate() {}
+    static response(ctx: AppContext) {
+        return new Response(formatBody(ctx.response.body), ctx.response);
+    };
+
+    /**
+     * The default validate handler
+     * @param ctx The current context
+     * @param app The app
+     * @returns 
+     */
+    static validate(ctx: AppContext, app: App): ValidateResult {
+        const path = ctx.request.url.match(urlRegex);
+        if (app.ico && path[2] === "/favicon.ico")
+            return new Response(app.ico);
+    }
 }
 
 export { App };
