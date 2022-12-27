@@ -20,7 +20,7 @@ export interface AppResponse extends ResponseInit {
 /**
  * Request context
  */
-export interface AppContext<App> {
+export interface AppContext<App> extends Record<string | number | symbol, any> {
     /**
      * Incoming request
      */

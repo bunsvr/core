@@ -11,7 +11,7 @@ import { formatBody } from "./parsers";
 
 const urlRegex = /^(.*):\/\/[A-Za-z0-9:.]*([\/]{1}.*\/?)$/;
 
-interface Options extends TLSOptions, Partial<WebSocketServeOptions>, Partial<ServeOptions> {
+interface Options extends TLSOptions, Partial<ServerWebSocket>, Partial<WebSocketServeOptions>, Partial<ServeOptions> {
     serverNames: Record<string, TLSOptions>;
 }
 
