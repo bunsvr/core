@@ -15,11 +15,8 @@ app.websocket = {
 // Response when ws upgrade failed
 const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 
-// Use a validator
-// If upgrade success returns nothing
-// If not return upgrade failed response
-app.validate = async ctx => 
-    // Upgrade to WebSocket
+// Try upgrading to ws
+app.response = async ctx => 
     ctx.server.upgrade(ctx.request) || upgradeFailed;
 
 // Serve using bun

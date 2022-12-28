@@ -1,4 +1,4 @@
-import { App } from "../../..";
+import { App } from "../../../types";
 import { serve } from "bun";
 
 // Create a new app
@@ -14,7 +14,7 @@ app.use(async (ctx, next) => {
 });
 
 // Set icon
-app.icon(import.meta.dir + "/favicon.ico");
+await app.icon(import.meta.dir + "/favicon.ico");
 
 // Serve using bun
 serve(app);

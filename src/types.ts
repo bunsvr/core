@@ -8,6 +8,11 @@ export interface NextFunction {
 }
 
 /**
+ * App request object
+ */
+export interface AppRequest extends Request {}
+
+/**
  * App response object
  */
 export interface AppResponse extends ResponseInit {
@@ -24,7 +29,7 @@ export interface AppContext<App> extends Record<string | number | symbol, any> {
     /**
      * Incoming request
      */
-    readonly request: Request;
+    readonly request: AppRequest;
 
     /**
      * Response details
@@ -48,8 +53,3 @@ export interface AppContext<App> extends Record<string | number | symbol, any> {
 export interface Middleware<App> {
     (ctx: AppContext<App>, next: NextFunction): Promise<void>;
 }
-
-/**
- * App.validate result.
- */
-export type ValidateResult = boolean | void | null | undefined | Response;
