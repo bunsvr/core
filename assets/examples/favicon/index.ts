@@ -5,13 +5,7 @@ import { serve } from "bun";
 const app = new App();
 
 // Use a middleware
-app.use(async (ctx, next) => {
-    // Set response to "Hello!";
-    ctx.response.body = "Hello!";
-
-    // Call next middleware
-    await next();
-});
+app.use(async () => new Response("Hello!"));
 
 // Set icon
 await app.icon(import.meta.dir + "/favicon.ico");
