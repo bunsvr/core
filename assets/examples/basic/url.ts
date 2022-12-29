@@ -5,24 +5,23 @@ import { serve } from "bun";
 const app = new App();
 
 // Use a middleware
-app.use(async (ctx, next) => {
+app.use(async ctx => {
     const url = new URL(ctx.request.url);
-    const res = ctx.response;
+    let res = "";
 
     // Set response to parsed url parts
-    res.body = "Protocol: " + url.protocol + "\n";
-    res.body += "Domain: " + url.hostname + "\n";
-    res.body += "Port: " + url.port + "\n";
-    res.body += "Path: " + url.pathname + "\n";
-    res.body += "Hash: " + url.hash + "\n";
+    res = "Protocol: " + url.protocol + "\n";
+    res += "Domain: " + url.hostname + "\n";
+    res += "Port: " + url.port + "\n";
+    res += "Path: " + url.pathname + "\n";
+    res += "Hash: " + url.hash + "\n";
 
     // Loop through URL query
-    res.body += "Query:\n";
+    res += "Query:\n";
     for (const [key, val] of url.searchParams.entries()) 
-        res.body += "\t" + key + ": " + val + "\n";
+        res += "\t" + key + ": " + val + "\n";
     
-    // Call next middleware
-    await next();
+    return new Response(res);
 });
 
 // Serve using bun
