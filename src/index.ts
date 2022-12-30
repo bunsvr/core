@@ -36,10 +36,10 @@ interface Options extends TLSOptions, Partial<ServerWebSocket> {
      * @param request 
      * @returns 
      */
-    error?: (
+    error?(
         this: Server,
         request: Errorlike,
-      ) => Response | Promise<Response> | undefined | void | Promise<undefined>;
+    ): Response | Promise<Response> | undefined | void | Promise<undefined>;
 }
 
 interface App extends Options {
