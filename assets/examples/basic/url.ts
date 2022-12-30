@@ -5,8 +5,8 @@ import { serve } from "bun";
 const app = new App();
 
 // Use a middleware
-app.use(async ctx => {
-    const url = new URL(ctx.request.url);
+app.use(async request => {
+    const url = new URL(request.url);
     let res = "";
 
     // Set response to parsed url parts

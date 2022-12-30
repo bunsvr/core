@@ -16,8 +16,8 @@ app.websocket = {
 const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 
 // Try upgrading to ws
-app.use(async ctx => 
-    ctx.server.upgrade(ctx.request) || upgradeFailed
+app.use(async (request, server) => 
+    server.upgrade(request) || upgradeFailed
 );
 
 // Serve using bun
