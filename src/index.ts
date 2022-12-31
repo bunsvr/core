@@ -40,84 +40,63 @@ interface Options extends TLSOptions, Partial<ServerWebSocket> {
         this: Server,
         request: Errorlike,
     ): Response | Promise<Response> | undefined | void | Promise<undefined>;
-}
 
-interface App extends Options {
     /**
      * Fetch handler.
      * @param request Incoming request
      * @param server Current Bun.js server
      */
-    fetch(request: Request, server: Server): Promise<Response>;
-};
+    fetch(
+        request: Request,
+        server: Server
+    ): Promise<Response>;
+}
+
+interface App extends Options { };
 
 /**
  * A Bunsvr app
  */
-class App {
-    private mds: Middleware<App>[];
+class App<RequestData = any> {
+    private mds: Middleware<App, RequestData>[];
 
     /**
-     * App icon loaded in ArrayBuffer
+     * App base URI
      */
-    ico?: ArrayBuffer;
-
-    private faviconPath: string;
-    private base_uri: string = "http://localhost:3000";
+    baseURI: string;
 
     /**
      * Create an app that can be served using Bun.
      */
     constructor() {
+        this.baseURI = "http://localhost:3000";
         this.mds = [];
-        this.faviconPath = this.baseURI + "/favicon.ico";
-    }
-
-    /**
-     * Get the base URI of the app
-     */
-    get baseURI() {
-        return this.base_uri;
-    }
-
-    /**
-     * Set the base URI of the app
-     */
-    set baseURI(value: string) {
-        this.base_uri = value;
-        this.faviconPath = value + "/favicon.ico";
     }
 
     /**
      * Register a middleware
      * @param m The middleware to add
      */
-    use(m: Middleware<App>) {
-        this.mds.push(m);
-    }
+    use(m: Middleware<App, RequestData>) {
+        const f = m.bind(this);
+        this.mds.push(f);
 
-    /**
-     * Set an icon. 
-     * 
-     * By default an empty Response is returned for 
-     * every favicon request.
-     * @param path The icon path
-     */
-    async icon(path: string) {
-        this.ico = await file(path).arrayBuffer();
-    }
+        // If has only one middleware
+        if (!this.fetch)
+            this.fetch = f;
+        else {
+            const mds = this.mds;
+            const mdsLen = this.mds.length;
 
-    fetch = async (request: Request, server: Server) => {
-        if (this.ico && this.faviconPath === request.url)
-            return new Response(this.ico);
-
-        let i = -1, res: Response;
-        const mdsLen = this.mds.length;
-        
-        while (!res && ++i < mdsLen) 
-            res = await this.mds[i].call(this, request, server);
-
-        return res as Response;
+            // Manually set fetch function
+            this.fetch = async (request, server) => {
+                let res: Response;
+                for (let i = 0; i < mdsLen; ++i)
+                    /** @ts-ignore */
+                    if (res = await mds[i](request, server))
+                        return res;
+            }
+        }
     }
 }
 
