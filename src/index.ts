@@ -8,7 +8,7 @@ import {
 } from "bun";
 import { Middleware } from "./types";
 
-interface Options extends TLSOptions, Partial<ServerWebSocket> {
+interface Options<T> extends TLSOptions, Partial<ServerWebSocket> {
     serverNames: Record<string, TLSOptions>;
 
     /**
@@ -28,7 +28,7 @@ interface Options extends TLSOptions, Partial<ServerWebSocket> {
      *
      * For simpler type safety, see {@link Bun.websocket}
      */
-    websocket?: WebSocketHandler;
+    websocket?: WebSocketHandler<T>;
 
     /**
      * An error handler
@@ -52,7 +52,7 @@ interface Options extends TLSOptions, Partial<ServerWebSocket> {
     ): Promise<Response>;
 }
 
-interface App extends Options { };
+interface App<RequestData, T = any> extends Options<T> { };
 
 /**
  * A Bunsvr app
