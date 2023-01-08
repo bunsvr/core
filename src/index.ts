@@ -1,35 +1,14 @@
 import {
-    file,
     Server,
     TLSOptions,
     ServerWebSocket,
-    WebSocketHandler,
-    Errorlike
+    Errorlike,
+    GenericServeOptions
 } from "bun";
 import { Middleware } from "./types";
 
-interface Options<T> extends TLSOptions, Partial<ServerWebSocket> {
+interface Options<T> extends TLSOptions, Partial<ServerWebSocket>, GenericServeOptions {
     serverNames: Record<string, TLSOptions>;
-
-    /**
-     * What is the maximum size of a request body? (in bytes)
-     * @default 1024 * 1024 * 128 // 128MB
-     */
-    maxRequestBodySize?: number;
-
-    /**
-     * Render contextual errors? This enables bun's error page
-     * @default process.env.NODE_ENV !== 'production'
-     */
-    development?: boolean;
-
-    /**
-     * Enable websockets with {@link Bun.serve}
-     *
-     * For simpler type safety, see {@link Bun.websocket}
-     */
-    websocket?: WebSocketHandler<T>;
-
     /**
      * An error handler
      * @param this 
@@ -54,23 +33,104 @@ interface Options<T> extends TLSOptions, Partial<ServerWebSocket> {
 
 interface App<RequestData, T = any> extends Options<T> { };
 
+function withoutPath(url: URL) {
+    return url.protocol + "//" + url.hostname + ":" + url.port;
+}
+
 /**
  * A Bunsvr app
  */
 class App<RequestData = any> {
     private mds: Middleware<App, RequestData>[];
-
-    /**
-     * App base URI
-     */
-    baseURI: string;
+    // Set URL
+    #url: URL;
+    #baseURI: string;
 
     /**
      * Create an app that can be served using Bun.
      */
     constructor() {
-        this.baseURI = "http://localhost:3000";
+        this.#url = new URL("http://localhost:3000");
+        this.#baseURI = withoutPath(this.#url);
+
         this.mds = [];
+    }
+
+    /**
+     * Parsed base URI
+     */
+    get url() {
+        return this.#url;
+    }
+    set url(url) {
+        this.#url = url;
+        this.#baseURI = withoutPath(url);
+    }
+
+    /**
+     * What URI should be used to make {@link Request.url} absolute?
+     *
+     * By default, looks at {@link hostname}, {@link port}, and whether or not SSL is enabled to generate one
+     *
+     * @example
+     *```js
+     * "http://my-app.com"
+     * ```
+     *
+     * @example
+     *```js
+     * "https://wongmjane.com/"
+     * ```
+     *
+     * This should be the public, absolute URL – include the protocol and {@link hostname}. If the port isn't 80 or 443, then include the {@link port} too.
+     *
+     * @example
+     * "http://localhost:3000"
+     */
+    get baseURI() {
+        return this.#baseURI;
+    }
+    set baseURI(baseURI) {
+        this.#url = new URL(baseURI);
+        this.#baseURI = withoutPath(this.#url);
+    }
+
+    /**
+     * What port should the server listen on?
+     * @default process.env.PORT || "3000"
+     */
+    set port(port: number | string) {
+        this.#url.port = String(port);
+        this.#baseURI = withoutPath(this.#url);
+    }
+    get port() {
+        return this.#url.port;
+    }
+
+    /**
+     * What hostname should the server listen on?
+     *
+     * @default
+     * ```js
+     * "0.0.0.0" // listen on all interfaces
+     * ```
+     * @example
+     *  ```js
+     * "127.0.0.1" // Only listen locally
+     * ```
+     * @example
+     * ```js
+     * "remix.run" // Only listen on remix.run
+     * ````
+     *
+     * note: hostname should not include a {@link port}
+     */
+    set hostname(hostname: string) {
+        this.#url.hostname = hostname;
+        this.#baseURI = withoutPath(this.#url);
+    }
+    get hostname() {
+        return this.#url.hostname;
     }
 
     /**
