@@ -1,5 +1,5 @@
 ## [`@bunsvr/core`](https://bunsvr.netlify.app/modules/_bunsvr_core.html)
-The core server of [BunSVR](github.com/bunsvr) which aims to be fast.
+The core server of [BunSVR](https://github.com/bunsvr) which aims to be fast.
 
 ```typescript
 import { App } from "@bunsvr/core";
