@@ -3,12 +3,21 @@ import {
     TLSOptions,
     ServerWebSocket,
     Errorlike,
-    GenericServeOptions
+    GenericServeOptions,
+    WebSocketHandler
 } from "bun";
 import { Middleware } from "./types";
 
 interface Options<T> extends TLSOptions, Partial<ServerWebSocket>, GenericServeOptions {
     serverNames: Record<string, TLSOptions>;
+
+    /**
+     * Enable websockets with {@link Bun.serve}
+     * 
+     * For simpler type safety, see {@link Bun.websocket}
+     */
+    websocket?: WebSocketHandler<T>;
+
     /**
      * An error handler
      * @param this 
