@@ -1,6 +1,6 @@
 {
   "name": "@bunsvr/core",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "repository": {
     "url": "https://github.com/bunsvr/core"
   },
@@ -10,7 +10,7 @@
     "esbuild": "^0.16.10",
     "typescript": "^4.9.4"
   },
-  "description": "Core server of bunsvr",
+  "description": "Core server of bunsvr, which aims to be fast",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --format=esm --minify --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
   },
