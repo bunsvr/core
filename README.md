@@ -18,6 +18,6 @@ app.hostname = "127.0.0.1";
 export default app;
 ```
 
-See more examples [here](https://github.com/bunsvr/core/tree/main/assets/examples).
+See more examples [here](/assets/examples).
 
 
