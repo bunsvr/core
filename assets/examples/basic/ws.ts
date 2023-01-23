@@ -1,5 +1,4 @@
 import { App } from "../../..";
-import { serve } from "bun";
 
 // Create a new app
 const app = new App();
@@ -15,10 +14,7 @@ app.websocket = {
 // Response when ws upgrade failed
 const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 
-// Try upgrading to ws
-app.use(async (request, server) => 
+// Try upgrading to ws (app.use returns the current app)
+export default app.use(async (request, server) => 
     server.upgrade(request) || upgradeFailed
 );
-
-// Serve using bun
-serve(app);

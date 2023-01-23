@@ -5,9 +5,16 @@ import { Server } from "bun";
  */
 export interface AppRequest<T = any> extends Request {
     /**
-     * A data object to pass data through middlewares
+     * A data object to pass data through middlewares.
      */
     data?: T;
+
+    /**
+     * The request parameters.
+     * 
+     * Only use this with `@bunsvr/router`
+     */
+    params?: string[];
 }
 
 /**
