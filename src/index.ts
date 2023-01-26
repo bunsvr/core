@@ -72,11 +72,15 @@ class App<RequestData = any> {
 
             // Manually set fetch function
             this.fetch = async (request, server) => {
-                let res: Response;
-                for (let i = 0; i < mdsLen; ++i)
+                let res: any;
+                for (let i = 0; i < mdsLen; ++i) {
                     /** @ts-ignore */
-                    if (res = await mds[i](request, server))
+                    res = mds[i](request, server);
+                    if (res?.then) await res;
+
+                    if (res instanceof Response)
                         return res;
+                }
             }
         }
 
