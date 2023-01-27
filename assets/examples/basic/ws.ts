@@ -15,6 +15,6 @@ app.websocket = {
 const upgradeFailed = new Response("Upgrade failed", { status: 400 });
 
 // Try upgrading to ws (app.use returns the current app)
-export default app.use(async (request, server) => 
+export default app.use((request, server) => 
     server.upgrade(request) || upgradeFailed
 );

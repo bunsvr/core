@@ -3,8 +3,8 @@ import { App } from "../../..";
 // Create a new app
 export default new App<string>()
     // Set data
-    .use(async request => 
-        void (request.data = "Hello!"))
+    .use(req => 
+        void (req.data = "Hello!"))
     // Response
-    .use(async request => 
-        new Response(request.data));
+    .use(req => 
+        new Response(req.data));

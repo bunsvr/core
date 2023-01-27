@@ -67,7 +67,6 @@ class App<RequestData = any> {
         if (!this.fetch || this.mds.length === 1)
             this.fetch = f;
         else {
-            const mds = this.mds;
             const mdsLen = this.mds.length;
 
             // Manually set fetch function
@@ -75,8 +74,9 @@ class App<RequestData = any> {
                 let res: any;
                 for (let i = 0; i < mdsLen; ++i) {
                     /** @ts-ignore */
-                    res = mds[i](request, server);
-                    if (res?.then) await res;
+                    res = this.mds[i](request, server);
+                    if (res instanceof Promise) 
+                        res = await res;
 
                     if (res instanceof Response)
                         return res;
