@@ -1,6 +1,6 @@
 {
-  "name": "@bunsvr/core",
-  "version": "0.0.12",
+  "name": "@stricjs/core",
+  "version": "1.0.0",
   "repository": {
     "url": "https://github.com/bunsvr/core"
   },
@@ -10,7 +10,7 @@
     "esbuild": "^0.16.10",
     "typescript": "^4.9.4"
   },
-  "description": "Core server of BunSVR, which aims to be fast",
+  "description": "Core server of StricJS, which aims to be fast",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --format=esm --minify --external:bun --outfile=index.js && tsc --declaration --outDir types --emitDeclarationOnly"
   },
@@ -18,6 +18,6 @@
   "types": "types/index.d.ts",
   "typedoc": {
     "entryPoint": "./src/index.ts",
-    "displayName": "@bunsvr/core"
+    "displayName": "@stricjs/core"
   }
 }
