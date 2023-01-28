@@ -1,7 +1,7 @@
-The core server of [BunSVR](https://github.com/bunsvr) which aims to be fast.
+The core server of [StricJS](https://github.com/bunsvr) which aims to be fast.
 
 ```typescript
-import { App } from "@bunsvr/core";
+import { App } from "@stricjs/core";
 
 // Create a new app
 const app = new App();
