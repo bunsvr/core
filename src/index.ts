@@ -6,7 +6,15 @@ import {
     GenericServeOptions,
     WebSocketHandler
 } from "bun";
-import { Middleware } from "./types";
+
+declare global {
+    interface Request<T = any> {
+        /**
+         * Data object to store some vars through middlewares 
+         */
+        data?: T;
+    }
+}
 
 interface Options<T> extends TLSOptions, Partial<ServerWebSocket>, GenericServeOptions {
     serverNames: Record<string, TLSOptions>;
@@ -40,13 +48,25 @@ interface Options<T> extends TLSOptions, Partial<ServerWebSocket>, GenericServeO
     ): Promise<Response>;
 }
 
-interface App<RequestData, T = any> extends Options<T> { };
+/**
+ * Middleware function
+ */
+export interface Middleware<T = any> {
+    /**
+     * @param this The current app
+     * @param request The current request with a data object
+     * @param server The current server
+     */
+    (this: App, request: Request<T>, server: Server): any;
+}
+
+export interface App<T = any> extends Options<T> { };
 
 /**
- * A BunSVR app
+ * A Stric app
  */
-class App<RequestData = any> {
-    private mds: Middleware<App, RequestData>[];
+export class App<T = any> {
+    private mds: Middleware<T>[];
 
     /**
      * Create an app that can be served using Bun.
@@ -59,7 +79,7 @@ class App<RequestData = any> {
      * Register a middleware
      * @param m The middleware to add
      */
-    use(m: Middleware<App, RequestData>) {
+    use(m: Middleware<T>) {
         const f = m.bind(this);
         this.mds.push(f);
 
@@ -86,7 +106,4 @@ class App<RequestData = any> {
 
         return this;
     }
-}
-
-export { App };
-export * from "./types";
+};
