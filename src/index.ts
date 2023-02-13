@@ -98,7 +98,7 @@ export class App<T = any> {
                     if (res instanceof Promise) 
                         res = await res;
 
-                    if (res instanceof Response)
+                    if (res)
                         return res;
                 }
             }
